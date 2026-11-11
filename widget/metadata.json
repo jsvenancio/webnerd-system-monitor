@@ -1,0 +1,31 @@
+{
+  "KPlugin": {
+    "Id": "pt.webnerd.systemmonitor",
+    "Name": "Webnerd System Monitor",
+    "Description": "System monitor for KDE Plasma 6, with charts and sensors.",
+    "Icon": "utilities-system-monitor",
+    "Version": "0.3.0",
+    "License": "GPL-3.0-or-later",
+    "Authors": [
+      {
+        "Name": "Webnerd.pt",
+        "Task": "Concept, development and maintenance",
+        "Task[pt]": "Conceção, desenvolvimento e manutenção",
+        "Task[pt_PT]": "Conceção, desenvolvimento e manutenção",
+        "Website": "https://webnerdept.wordpress.com/"
+      }
+    ],
+    "Category": "System Information",
+    "Website": "https://github.com/jsvenancio/webnerd-system-monitor",
+    "Description[pt]": "Monitor de sistema para KDE Plasma 6, com gráficos e sensores.",
+    "Description[pt_PT]": "Monitor de sistema para KDE Plasma 6, com gráficos e sensores.",
+    "Copyright": "© 2026 Webnerd.pt",
+    "BugReportUrl": "https://github.com/jsvenancio/webnerd-system-monitor/issues"
+  },
+  "KPackageStructure": "Plasma/Applet",
+  "X-Plasma-API-Minimum-Version": "6.0",
+  "X-Plasma-API": "declarativeapplets",
+  "X-Plasma-FormFactors": [
+    "desktop"
+  ]
+}
