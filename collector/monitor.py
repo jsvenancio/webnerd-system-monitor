@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 import psutil
+from network import network_sampler
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -80,6 +81,7 @@ def collect(disk_path="/", ai_checks=True):
                  "free_gib": round(disk.free / 1024**3, 2),
                  "usage_percent": round(disk.used / disk.total * 100, 1) if disk.total else None},
         "load_average": {"1_min": load[0], "5_min": load[1], "15_min": load[2]},
+        "network": network_sampler.read(),
         "temperatures": temperatures(),
         "services": {
             "ollama": check_service("http://127.0.0.1:11434/api/version", True) if ai_checks else {"status": "disabled"},

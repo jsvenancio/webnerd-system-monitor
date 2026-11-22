@@ -47,6 +47,7 @@ fi
 if $with_collector; then
   mkdir -p "$collector_dir" "$unit_dir"
   install -m 644 "$here/collector/monitor.py" "$collector_dir/monitor.py"
+  install -m 644 "$here/collector/network.py" "$collector_dir/network.py"
   cat > "$unit" <<'UNIT'
 [Unit]
 Description=Webnerd System Monitor local collector

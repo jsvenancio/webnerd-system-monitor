@@ -23,3 +23,7 @@ The existing v0.2 collector's core fields remain compatible with this widget. Ex
 Missing optional values must remain absent/null/unavailable, not be represented as fabricated zeros. A timestamp more than one minute away from the reader's clock is considered stale. A correctly synchronized clock is required.
 
 Do not treat service availability as proof of model loading, successful inference, database health or user authentication. The checks are basic local HTTP probes.
+
+## Network extension (0.4)
+
+`network` adds `default_interface` (string or null) and `interfaces` (object keyed by interface name). Each interface contains `is_up`, `download_bytes_per_second`, `upload_bytes_per_second`. Rates are null during warm-up, counter reset or disconnection. Values are bytes/second, sampled independently once per second; UI converts to decimal bits/second. No interface IP addresses are returned. Existing API fields retain their meanings.

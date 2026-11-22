@@ -15,6 +15,34 @@ PlasmoidItem {
     readonly property bool portuguese: Plasmoid.configuration.language === 2 || (Plasmoid.configuration.language === 0 && Qt.locale().name.indexOf("pt") === 0)
     readonly property bool showGpu: Plasmoid.configuration.showGpu
     readonly property bool showAiServices: Plasmoid.configuration.showAiServices
+    readonly property bool showNetwork: Plasmoid.configuration.showNetwork
+    readonly property string networkInterface: String(Plasmoid.configuration.networkInterface || "").trim()
+    readonly property real backgroundAlpha: Math.max(20, Math.min(100, Plasmoid.configuration.backgroundOpacity)) / 100
+    function background(hex) { const c = Qt.color(hex); return Qt.rgba(c.r, c.g, c.b, backgroundAlpha) }
+    function networkData() {
+        const n = snapshot && snapshot.network
+        const name = networkInterface || (n ? n.default_interface : "")
+        const item = n && n.interfaces && n.interfaces[name]
+        return { name: name || "—", down: item && item.is_up ? item.download_bytes_per_second : null,
+                 up: item && item.is_up ? item.upload_bytes_per_second : null }
+    }
+    function rate(value) {
+        if (!online || typeof value !== "number" || !isFinite(value)) return "—"
+        const bits = value * 8
+        return bits >= 1000000000 ? (bits / 1000000000).toFixed(2) + " Gbit/s" :
+               bits >= 1000000 ? (bits / 1000000).toFixed(2) + " Mbit/s" :
+               (bits / 1000).toFixed(1) + " kbit/s"
+    }
+    readonly property real networkMaximum: {
+        let highest = 125000
+        for (let i = 0; i < history.length; i++) {
+            const p = history[i]
+            if (typeof p.down === "number") highest = Math.max(highest, p.down)
+            if (typeof p.up === "number") highest = Math.max(highest, p.up)
+        }
+        return highest * 1.1
+    }
+    onNetworkInterfaceChanged: history = []
     function t(en, pt) { return portuguese ? pt : en }
     onApiUrlChanged: {
         if (!componentReady) return
@@ -76,11 +104,14 @@ PlasmoidItem {
     function remember(valid) {
         const now = Date.now()
         const s = snapshot || {}
+        const net = networkData()
+        if (history.length && history[history.length - 1].net !== net.name) history = []
         const next = history.filter(function(point) { return point.t >= now - 300000 })
         next.push({t: now,
                    cpu: valid && s.cpu ? s.cpu.usage_percent : null,
                    ram: valid && s.ram ? s.ram.usage_percent : null,
-                   gpu: valid && s.gpu ? s.gpu.utilization_percent : null})
+                   gpu: valid && s.gpu ? s.gpu.utilization_percent : null,
+                   down: valid ? net.down : null, up: valid ? net.up : null, net: net.name})
         history = next.slice(-64)
     }
     function fail(reason) {
@@ -165,27 +196,28 @@ PlasmoidItem {
         Layout.minimumWidth: 300
         Layout.minimumHeight: 380
         Layout.preferredWidth: 350
-        Layout.preferredHeight: 950
+        Layout.preferredHeight: 1000
         implicitWidth: 350
-        implicitHeight: 950
+        implicitHeight: 1000
         radius: 16
-        color: "#131a24"
-        border.color: "#2c3b4e"
+        color: root.background("#131a24")
+        border.color: root.background("#2c3b4e")
 
-        ScrollView {
-            id: scroll
+        Item {
+            id: viewport
             anchors.fill: parent
-            anchors.margins: 16
-            clip: true
-            contentWidth: availableWidth
-            contentHeight: column.implicitHeight
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
-            ScrollBar.vertical.policy: ScrollBar.AsNeeded
+            anchors.margins: 12
+            // Compact natural layout first; fit the complete content if the user
+            // resizes the widget below that height. No information is scrolled away.
+            readonly property real contentScale: Math.min(1, height / Math.max(1, column.implicitHeight))
 
             ColumnLayout {
                 id: column
-                width: scroll.availableWidth
-                spacing: 9
+                width: viewport.width
+                x: (viewport.width - width * viewport.contentScale) / 2
+                scale: viewport.contentScale
+                transformOrigin: Item.TopLeft
+                spacing: 6
                 Text {
                     text: "WEBNERD · SYSTEM MONITOR"
                     color: root.accent
@@ -204,7 +236,7 @@ PlasmoidItem {
                         Layout.fillWidth: true
                         elide: Text.ElideRight
                     }
-                    Text { text: "v0.3"; color: "#94a3b8"; font.pixelSize: 11 }
+                    Text { text: "v0.4.1"; color: "#94a3b8"; font.pixelSize: 11 }
                 }
                 Text {
                     text: (root.online ? "● " : "○ ") + root.message
@@ -241,21 +273,21 @@ PlasmoidItem {
                         id: card
                         required property var modelData
                         Layout.fillWidth: true
-                        Layout.preferredHeight: 114
+                        Layout.preferredHeight: 88
                         radius: 10
-                        color: "#1c2735"
+                        color: root.background("#1c2735")
                         ColumnLayout {
                             anchors.fill: parent
-                            anchors.margins: 10
-                            spacing: 4
+                            anchors.margins: 8
+                            spacing: 3
                             RowLayout {
                                 Layout.fillWidth: true
                                 Text { text: card.modelData.title; color: "#cbd5e1"; font.pixelSize: 11; Layout.fillWidth: true }
-                                Text { text: card.modelData.value; color: card.modelData.tint; font.pixelSize: 22; font.bold: true }
+                                Text { text: card.modelData.value; color: card.modelData.tint; font.pixelSize: 20; font.bold: true }
                             }
                             Sparkline {
                                 Layout.fillWidth: true
-                                Layout.preferredHeight: 36
+                                Layout.preferredHeight: 22
                                 samples: root.history
                                 field: card.modelData.field
                                 lineColor: card.modelData.tint
@@ -281,11 +313,53 @@ PlasmoidItem {
                     Layout.fillWidth: true; wrapMode: Text.Wrap
                 }
                 Rectangle {
-                    Layout.fillWidth: true; Layout.preferredHeight: temperatureContent.implicitHeight + 28
-                    radius: 10; color: "#1c2735"
+                    visible: root.showNetwork
+                    Layout.fillWidth: true
+                    Layout.preferredHeight: networkContent.implicitHeight + 16
+                    radius: 10; color: root.background("#1c2735")
+                    ColumnLayout {
+                        id: networkContent
+                        anchors.fill: parent; anchors.margins: 8; spacing: 6
+                        Text {
+                            text: root.t("NETWORK · ", "REDE · ") + root.networkData().name
+                            color: "#cbd5e1"; font.pixelSize: 11
+                            Layout.fillWidth: true; elide: Text.ElideRight
+                        }
+                        Repeater {
+                            model: [ {label: "↓ Download", field: "down", tint: "#38bdf8"},
+                                     {label: "↑ Upload", field: "up", tint: "#fb923c"} ]
+                            delegate: ColumnLayout {
+                                id: netRow
+                                required property var modelData
+                                Layout.fillWidth: true; spacing: 3
+                                RowLayout {
+                                    Layout.fillWidth: true
+                                    Text { text: netRow.modelData.label; color: "#cbd5e1"; font.pixelSize: 11; Layout.fillWidth: true }
+                                    Text { text: root.rate(root.networkData()[netRow.modelData.field]); color: netRow.modelData.tint; font.pixelSize: 16; font.bold: true }
+                                }
+                                Sparkline {
+                                    Layout.fillWidth: true; Layout.preferredHeight: 20
+                                    samples: root.history
+                                    field: netRow.modelData.field
+                                    maximumValue: root.networkMaximum
+                                    lineColor: netRow.modelData.tint
+                                    maxGapMs: root.refreshSeconds * 1000 + 10000
+                                }
+                            }
+                        }
+                        Text {
+                            text: root.t("Traffic · automatic scale · not a speed test", "Tráfego · escala automática · não é um teste de velocidade")
+                            color: "#94a3b8"; font.pixelSize: 10
+                            Layout.fillWidth: true; wrapMode: Text.Wrap
+                        }
+                    }
+                }
+                Rectangle {
+                    Layout.fillWidth: true; Layout.preferredHeight: temperatureContent.implicitHeight + 20
+                    radius: 10; color: root.background("#1c2735")
                     ColumnLayout {
                         id: temperatureContent
-                        anchors.fill: parent; anchors.margins: 10; spacing: 5
+                        anchors.fill: parent; anchors.margins: 8; spacing: 5
                         Text { text: root.t("TEMPERATURES", "TEMPERATURAS"); color: "#cbd5e1"; font.pixelSize: 11; font.bold: true }
                         Repeater {
                             model: [
@@ -303,10 +377,10 @@ PlasmoidItem {
                     }
                 }
                 Rectangle {
-                    Layout.fillWidth: true; Layout.preferredHeight: 78
-                    radius: 10; color: "#1c2735"
+                    Layout.fillWidth: true; Layout.preferredHeight: 66
+                    radius: 10; color: root.background("#1c2735")
                     ColumnLayout {
-                        anchors.fill: parent; anchors.margins: 10; spacing: 5
+                        anchors.fill: parent; anchors.margins: 8; spacing: 5
                         RowLayout {
                             Layout.fillWidth: true
                             Text { text: root.t("STORAGE · ", "ARMAZENAMENTO · ") + (root.snapshot && root.snapshot.disk ? root.snapshot.disk.mountpoint : "/"); color: "#cbd5e1"; font.pixelSize: 11; Layout.fillWidth: true }
@@ -329,10 +403,10 @@ PlasmoidItem {
                     }
                 }
                 Rectangle {
-                    Layout.fillWidth: true; Layout.preferredHeight: 60
-                    radius: 10; color: "#1c2735"
+                    Layout.fillWidth: true; Layout.preferredHeight: 52
+                    radius: 10; color: root.background("#1c2735")
                     ColumnLayout {
-                        anchors.fill: parent; anchors.margins: 10; spacing: 5
+                        anchors.fill: parent; anchors.margins: 8; spacing: 5
                         Text { text: root.t("SYSTEM LOAD · 1 / 5 / 15 MIN", "CARGA DO SISTEMA · 1 / 5 / 15 MIN"); color: "#cbd5e1"; font.pixelSize: 10 }
                         Text {
                             text: {
@@ -345,10 +419,10 @@ PlasmoidItem {
                 }
                 Rectangle {
                     visible: root.showAiServices
-                    Layout.fillWidth: true; Layout.preferredHeight: 76
-                    radius: 10; color: "#1c2735"
+                    Layout.fillWidth: true; Layout.preferredHeight: 66
+                    radius: 10; color: root.background("#1c2735")
                     ColumnLayout {
-                        anchors.fill: parent; anchors.margins: 10; spacing: 5
+                        anchors.fill: parent; anchors.margins: 8; spacing: 5
                         Text { text: root.t("AI SERVICES", "SERVIÇOS DE INTELIGÊNCIA ARTIFICIAL"); color: "#cbd5e1"; font.pixelSize: 10 }
                         Repeater {
                             model: [{label: "Ollama", key: "ollama"}, {label: "Open WebUI", key: "open_webui"}]
@@ -366,7 +440,7 @@ PlasmoidItem {
                     }
                 }
                 Text {
-                    text: root.t("Last valid response · ", "Última resposta válida · ") + root.lastSuccess + root.t("\nHistory in memory · resets when reloaded\nWebnerd.pt · System Monitor · v0.3.0", "\nHistórico em memória · reinicia ao carregar\nWebnerd.pt · System Monitor · v0.3.0")
+                    text: root.t("Last valid response · ", "Última resposta válida · ") + root.lastSuccess + root.t("\nHistory in memory · resets when reloaded\nWebnerd.pt · System Monitor · v0.4.1", "\nHistórico em memória · reinicia ao carregar\nWebnerd.pt · System Monitor · v0.4.1")
                     color: "#94a3b8"; font.pixelSize: 10
                     Layout.fillWidth: true; wrapMode: Text.Wrap
                 }

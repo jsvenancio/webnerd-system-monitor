@@ -4,23 +4,30 @@
     "Name": "Webnerd System Monitor",
     "Description": "System monitor for KDE Plasma 6, with charts and sensors.",
     "Icon": "utilities-system-monitor",
-    "Version": "0.3.0",
+    "Version": "0.4.1",
     "License": "GPL-3.0-or-later",
     "Authors": [
       {
+        "Name": "Joaquim Venâncio",
+        "Task": "Project concept and direction",
+        "Task[pt]": "Conceção e direção do projeto",
+        "Task[pt_PT]": "Conceção e direção do projeto",
+        "Website": "https://portfolio.jsvenancio.com/"
+      },
+      {
         "Name": "Webnerd.pt",
-        "Task": "Concept, development and maintenance",
-        "Task[pt]": "Conceção, desenvolvimento e manutenção",
-        "Task[pt_PT]": "Conceção, desenvolvimento e manutenção",
-        "Website": "https://webnerdept.wordpress.com/"
+        "Task": "Development and maintenance",
+        "Task[pt]": "Desenvolvimento e manutenção",
+        "Task[pt_PT]": "Desenvolvimento e manutenção",
+        "Website": "https://webnerd.pt/"
       }
     ],
     "Category": "System Information",
-    "Website": "https://github.com/jsvenancio/webnerd-system-monitor",
+    "Website": "https://webnerd.pt/",
     "Description[pt]": "Monitor de sistema para KDE Plasma 6, com gráficos e sensores.",
     "Description[pt_PT]": "Monitor de sistema para KDE Plasma 6, com gráficos e sensores.",
     "Copyright": "© 2026 Webnerd.pt",
-    "BugReportUrl": "https://github.com/jsvenancio/webnerd-system-monitor/issues"
+    "BugReportUrl": "https://webnerdept.wordpress.com/contacte-nos/"
   },
   "KPackageStructure": "Plasma/Applet",
   "X-Plasma-API-Minimum-Version": "6.0",

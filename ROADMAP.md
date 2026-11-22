@@ -1,13 +1,15 @@
 # Roadmap
 
-## Next session — configurable background opacity
+## 0.4.1 — validated on the maintainer’s Nobara KDE desktop
 
-Requested by the project owner on 2026-11-11. Planned, not implemented in v0.3.0.
+- Download/upload charts and configurable network interface.
+- Saved background opacity with live preview and discard restoration.
+- Compact full-content layout with height adaptation.
+- Author portfolio and labelled project links.
+- Ctrl+Alt+M setup helper, preserving existing shortcuts and checking conflicts.
 
-- Add a background-opacity slider to the widget settings.
-- Allow the user to choose an opaque or partly transparent background.
-- Preserve text, chart and indicator readability instead of fading the entire widget.
-- Save the chosen value in Plasma configuration and provide a sensible opaque default.
-- Validate appearance on light and dark wallpapers.
+## Later
 
-This is a future improvement, not a promise that v0.3.0 already supports transparency controls.
+- Feedback form (problem, proposed solution, feature request); provider and URL undecided.
+- Separate Windows implementation and repository, after this Linux update.
+- Further hardware and distribution validation.

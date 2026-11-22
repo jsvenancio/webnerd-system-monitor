@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.1 — 2026-11-22 (experimental)
+
+- Add download/upload charts, decimal bit-rate units and network interface selection.
+- Sample network counters independently of HTTP readers; show unavailable values during warm-up/disconnection.
+- Add per-widget background opacity, live preview and Apply/discard handling.
+- Fit all cards into the widget without scrolling using compact spacing and height adaptation.
+- Add author portfolio, labelled project links and a conflict-aware Ctrl+Alt+M setup helper.
+- Preserve the existing metrics contract and keep external Lab services independent.
+- Validate network display, layout and opacity preview/save/discard on Nobara KDE; add network-rate tests.
+
 ## 0.3.0 — experimental
 
 - Extract a standalone Plasma package and loopback-only Python collector.

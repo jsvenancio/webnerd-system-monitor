@@ -3,11 +3,13 @@ import http.client
 import importlib.util
 import json
 import threading
+import sys
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 source = Path(__file__).resolve().parents[1] / "collector/monitor.py"
+sys.path.insert(0, str(source.parent))
 spec = importlib.util.spec_from_file_location("webnerd_monitor", source)
 monitor = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(monitor)

@@ -7,4 +7,9 @@ ConfigModel {
         icon: "utilities-system-monitor"
         source: "configGeneral.qml"
     }
+    ConfigCategory {
+        name: "Project / Projeto"
+        icon: "help-about"
+        source: "configProject.qml"
+    }
 }

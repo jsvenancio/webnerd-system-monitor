@@ -3,6 +3,8 @@ import QtQuick
 
 Canvas {
     id: chart
+    property real maximumValue: 100
+    onMaximumValueChanged: requestPaint()
     property var samples: []
     property int maxGapMs: 25000
     property string field: "cpu"
@@ -50,7 +52,7 @@ Canvas {
                 continue
             }
             const x = pad + w * Math.max(0, Math.min(1, (p.t - start) / 300000))
-            const y = pad + h * (1 - Math.max(0, Math.min(100, v)) / 100)
+            const y = pad + h * (1 - Math.max(0, Math.min(maximumValue, v)) / Math.max(1, maximumValue))
             if (connected && p.t - previousTime <= maxGapMs) ctx.lineTo(x, y)
             else ctx.moveTo(x, y)
             connected = true

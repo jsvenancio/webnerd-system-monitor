@@ -1,26 +1,26 @@
-# Publication review — experimental 0.3.0
+# Publication review — experimental 0.4.1
 
-Prepared on 2026-11-11 for `webnerd-system-monitor`.
+Prepared on 2026-11-22 for the existing `jsvenancio/webnerd-system-monitor` repository.
 
 ## Completed
 
-- Standalone Plasma package and loopback-only Python collector.
-- API URL, interval, PT/EN and optional-card configuration.
-- English and Portuguese documentation; full GPLv3 text and GPL-3.0-or-later metadata.
-- Python collector tests and shell syntax checks.
-- Actual standalone collector process startup and HTTP response in an isolated environment.
-- Preview loading, configuration page, English selection, 10-second interval and AI-card hiding visually confirmed on Nobara Linux 44 / Plasma 6.7.5.
-- Native About page visually confirmed with compact Portuguese summary, copyright, authorship, website/help links and license display.
-- Private network identifiers, credentials, private infrastructure code and personal screenshots excluded.
+- Download/upload charts with independent local sampling and interface selection.
+- Compact full-content layout without a scroll bar, confirmed on the maintainer’s Nobara Linux 44 / KDE Plasma 6 desktop.
+- Background-opacity preview, Apply persistence and discard restoration confirmed by the maintainer.
+- Automatic Ctrl+Alt+M assignment reported successful by the local setup helper; editable native shortcut settings retained.
+- Native author portfolio and labelled project links; existing contact help retained pending a future form.
+- Six collector/network tests passed; shell syntax and Python compilation checks passed.
+- Standalone HTTP endpoint returned a valid network extension in the isolated workspace, whose network exposes no non-loopback interface; numerical rate calculations covered by deterministic tests and actual interface readings confirmed on the maintainer’s ASUS.
+- Private service configuration, credentials, network identifiers and personal screenshots excluded from the public source.
 
-## Known limits
+## Limits
 
-Other distributions, Intel-specific sensors, API changes and the full desktop-service installation/removal flow remain unverified. State this as an experimental source release; do not claim broad compatibility or a stable release. An anonymous screenshot can be added later.
+Experimental source update. Other distributions/hardware, IPv6-only automatic selection, live shortcut-conflict/multiple-widget behavior and the complete standalone desktop-service install/removal flow remain unverified. Small widget sizes reduce text size. Network rates include local traffic and are not speed-test results.
 
-## Publication authorization
+## Scope
 
-The owner authorized creation of the public repository and the initial commit/push on 2026-11-11. This document records the source review, not a claim of a stable release. No separate GitHub release or tag is part of this initial source publication.
+Update the existing Linux repository only. No Windows repository, new infrastructure service, tag or GitHub release is included. The local ASUS adapter is separate from the public source; its existing collector, sender and Mission Control integration remain independent.
 
-## Intended description
+## Publication
 
-A private, configurable system-monitor sidebar for KDE Plasma 6, with local Python metrics, live charts and optional AI service checks.
+The initial public repository was authorized and published on 2026-11-11. The owner explicitly authorized the 0.4.1 commit and push on 2026-11-22. No separate tag or GitHub release was requested.
